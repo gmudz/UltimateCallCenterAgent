@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+data/gemini_config.json
+
+# SQLite Database & Runtime Data
+data/users.db
+data/users.db-journal
+data/users.db-wal
+data/users.db-shm
+
+# Dynamic User Uploads & Audio Recordings (preserve structure)
+data/uploads/*
+!data/uploads/.gitkeep
+data/recordings/*
+!data/recordings/.gitkeep
+
+# IDE & Editor Settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

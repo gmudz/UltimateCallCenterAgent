@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة التدريب | AI Sales Copilot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-header h1 {
+            font-size: 1.4rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a {
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-glass);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-glass);
+            transition: all 0.2s;
+        }
+
+        .admin-nav a:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border-glass);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-card);
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .upload-zone-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .upload-zone-text strong {
+            color: var(--accent-blue);
+        }
+
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+
+        /* Category Select */
+        .category-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-glass);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        /* File List */
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem;
+            border-radius: 8px;
+            background: var(--bg-glass);
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-glass);
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .file-item-icon {
+            font-size: 1.5rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+
+        .file-item-info {
+            flex: 1;
+        }
+
+        .file-item-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .file-item-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+        }
+
+        .file-item-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .file-item-actions button {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-glass);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .file-item-actions .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-card-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Upload Progress */
+        .upload-progress {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .upload-progress.active {
+            display: block;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg-glass);
+            border-radius: 8px;
+            margin-bottom: 0.3rem;
+        }
+
+        .progress-item .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-glass);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-item.done .spinner {
+            display: none;
+        }
+
+        .progress-item.done::before {
+            content: '✅';
+            margin-left: 0.2rem;
+        }
+
+        .progress-item.error::before {
+            content: '❌';
+            margin-left: 0.2rem;
+        }
+
+        .progress-item.error .spinner {
+            display: none;
+        }
+
+        /* Empty State */
+        .files-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .files-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header
+        style="display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.5rem;border-bottom:1px solid var(--border-glass)">
+        <div class="admin-nav">
+            <a href="/">🎙️ لوحة التحكم</a>
+            <a href="/analytics">📊 التحليلات</a>
+            <a href="/training">🎓 التدريب</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.7rem">
+            <h1
+                style="margin:0;font-size:1.2rem;background:var(--gradient-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+                AI Sales Copilot</h1>
+            <div
+                style="width:36px;height:36px;border-radius:50%;background:var(--gradient-main);display:flex;align-items:center;justify-content:center;font-size:1.1rem">
+                🤖</div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <!-- Page Title -->
+        <div class="admin-header">
+            <div>
+                <h1>📁 إدارة ملفات التدريب</h1>
+                <p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.3rem">ارفع ملفات الشركة والسكربتات —
+                    الذكاء الاصطناعي يتعلم منها فوراً</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-value" id="totalDocs">0</div>
+                <div class="stat-card-label">وثيقة في قاعدة المعرفة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-value" id="totalFiles">0</div>
+                <div class="stat-card-label">ملف مرفوع</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-value" id="totalCategories">0</div>
+                <div class="stat-card-label">فئة</div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Left: Upload Zone -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="icon">📤</span> رفع ملفات جديدة</h3>
+                </div>
+                <div class="card-body">
+                    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-zone-icon">📂</div>
+                        <div class="upload-zone-text">
+                            <strong>اضغط هنا</strong> أو اسحب الملفات<br>
+                            <span style="font-size:0.7rem">PDF, DOCX, TXT, JSON — بدون حد حجم</span>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.json">
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div style="margin-top:1rem">
+                        <label style="font-size:0.75rem;color:var(--text-muted)">فئة الملف:</label>
+                        <div class="category-select" id="categorySelect">
+                            <button class="category-btn active" data-cat="auto">🤖 تلقائي</button>
+                            <button class="category-btn" data-cat="company_info">📋 معلومات الشركة</button>
+                            <button class="category-btn" data-cat="scripts">📝 سكربتات</button>
+                            <button class="category-btn" data-cat="objections">⚔️ معارضات</button>
+                            <button class="category-btn" data-cat="terms">📖 مصطلحات</button>
+                            <button class="category-btn" data-cat="competitors">🏢 منافسين</button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress"></div>
+                </div>
+            </div>
+
+            <!-- Right: Uploaded Files -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="icon">📄</span> الملفات المرفوعة</h3>
+                    <span class="card-badge" id="fileCountBadge"
+                        style="background:var(--bg-glass);color:var(--text-muted)">0</span>
+                </div>
+                <div class="card-body">
+                    <ul class="file-list" id="fileList">
+                        <div class="files-empty" id="filesEmpty">
+                            <div class="files-empty-icon">📭</div>
+                            <p>لا توجد ملفات مرفوعة بعد<br><span style="font-size:0.75rem">ارفع ملفات التدريب وسيتعلم
+                                    النظام منها فوراً</span></p>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini Settings -->
+        <div class="card" style="margin-top:1.5rem">
+            <div class="card-header">
+                <h3><span class="icon">✨</span> إعدادات Gemini AI</h3>
+                <span class="card-badge" id="geminiStatusBadge"
+                    style="background:rgba(239,68,68,0.15);color:var(--accent-red)">غير مفعّل</span>
+            </div>
+            <div class="card-body">
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.8rem">أدخل مفتاح Gemini API لتفعيل
+                    الردود الذكية — احصل على مفتاح مجاني من
+                    <a href="https://aistudio.google.com" target="_blank"
+                        style="color:var(--accent-blue)">aistudio.google.com</a>
+                </p>
+                <div style="display:flex;gap:0.5rem">
+                    <input type="password" class="form-input" id="geminiApiKey" placeholder="أدخل مفتاح Gemini API"
+                        style="flex:1;padding:0.55rem 0.8rem;background:rgba(255,255,255,0.04);border:1px solid var(--border-glass);border-radius:8px;color:var(--text-primary);font-family:'Tajawal',sans-serif;font-size:0.82rem;outline:none">
+                    <button onclick="saveGeminiKey()"
+                        style="padding:0.55rem 1.2rem;background:var(--gradient-main);border:none;border-radius:8px;color:white;font-family:'Tajawal',sans-serif;font-weight:700;cursor:pointer;font-size:0.82rem;white-space:nowrap">💾
+                        حفظ</button>
+                </div>
+                <div id="geminiMsg"
+                    style="display:none;margin-top:0.5rem;padding:0.4rem;border-radius:6px;font-size:0.75rem;text-align:center">
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Recordings -->
+        <div class="card" style="margin-top:1.5rem">
+            <div class="card-header">
+                <h3><span class="icon">🎙️</span> تسجيلات المكالمات</h3>
+                <span class="card-badge" id="recordingCountBadge"
+                    style="background:var(--bg-glass);color:var(--text-muted)">0</span>
+            </div>
+            <div class="card-body">
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.8rem">ارفع تسجيلات مكالمات سابقة —
+                    Gemini يفرّغها ويحلل نقاط القوة والضعف ويتعلم منها</p>
+
+                <!-- Recording Upload Zone -->
+                <div class="upload-zone" id="recordingZone" onclick="document.getElementById('recordingInput').click()"
+                    style="padding:1.2rem">
+                    <div style="font-size:2rem;margin-bottom:0.3rem">🎙️</div>
+                    <div class="upload-zone-text">
+                        <strong>ارفع تسجيلات مكالمات</strong><br>
+                        <span style="font-size:0.7rem">MP3, WAV, M4A, OGG, FLAC</span>
+                    </div>
+                    <input type="file" id="recordingInput" multiple accept=".mp3,.wav,.m4a,.ogg,.webm,.flac"
+                        style="display:none">
+                </div>
+                <div class="upload-progress" id="recordingProgress"></div>
+
+                <!-- Recording List -->
+                <div id="recordingList" style="margin-top:0.8rem"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedCategory = 'auto';
+
+        // ---- Init ----
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFiles();
+            loadStats();
+            loadGeminiStatus();
+            loadRecordings();
+            setupDragDrop();
+            setupCategoryButtons();
+            setupRecordingUpload();
+        });
+
+        // ---- Category Buttons ----
+        function setupCategoryButtons() {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedCategory = btn.dataset.cat;
+                });
+            });
+        }
+
+        // ---- Drag & Drop ----
+        function setupDragDrop() {
+            const zone = document.getElementById('uploadZone');
+            ['dragenter', 'dragover'].forEach(ev => {
+                zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('dragover'); });
+            });
+            ['dragleave', 'drop'].forEach(ev => {
+                zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('dragover'); });
+            });
+            zone.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) uploadFiles(files);
+            });
+            document.getElementById('fileInput').addEventListener('change', e => {
+                if (e.target.files.length > 0) uploadFiles(e.target.files);
+            });
+        }
+
+        // ---- Upload Files ----
+        async function uploadFiles(files) {
+            const progress = document.getElementById('uploadProgress');
+            progress.classList.add('active');
+            progress.innerHTML = '';
+
+            for (const file of files) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!['pdf', 'docx', 'txt', 'json'].includes(ext)) {
+                    progress.innerHTML += `<div class="progress-item error"><span>${file.name} — نوع غير مدعوم</span></div>`;
+                    continue;
+                }
+
+                const item = document.createElement('div');
+                item.className = 'progress-item';
+                item.innerHTML = `<div class="spinner"></div><span>يعالج ${file.name}...</span>`;
+                progress.appendChild(item);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('category', selectedCategory);
+
+                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        item.className = 'progress-item done';
+                        item.innerHTML = `<span>✅ ${file.name} — ${data.chunks_created} قطعة نصية</span>`;
+                        showToast(`✅ تم رفع ${file.name} — ${data.chunks_created} وثيقة مضافة`);
+                    } else {
+                        item.className = 'progress-item error';
+                        item.innerHTML = `<span>❌ ${file.name} — ${data.error || 'خطأ'}</span>`;
+                    }
+                } catch (err) {
+                    item.className = 'progress-item error';
+                    item.innerHTML = `<span>❌ ${file.name} — خطأ في الاتصال</span>`;
+                }
+            }
+
+            loadFiles();
+            loadStats();
+            document.getElementById('fileInput').value = '';
+        }
+
+        // ---- Load Files ----
+        async function loadFiles() {
+            try {
+                const res = await fetch('/api/documents');
+                const data = await res.json();
+                renderFileList(data.files || []);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderFileList(files) {
+            const list = document.getElementById('fileList');
+            const empty = document.getElementById('filesEmpty');
+            document.getElementById('fileCountBadge').textContent = files.length;
+            document.getElementById('totalFiles').textContent = files.length;
+
+            if (files.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(empty);
+                return;
+            }
+
+            const categories = new Set(files.map(f => f.category));
+            document.getElementById('totalCategories').textContent = categories.size;
+
+            const typeIcons = { '.pdf': '📕', '.docx': '📘', '.txt': '📄', '.json': '📋' };
+            list.innerHTML = files.map(f => {
+                const safeName = f.filename.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
+        <li class="file-item">
+          <div class="file-item-icon">${typeIcons[f.file_type] || '📄'}</div>
+          <div class="file-item-info">
+            <div class="file-item-name">${f.filename}</div>
+            <div class="file-item-meta">
+              <span>${f.icon} ${f.category_ar}</span>
+              <span>📊 ${f.chunks} قطعة</span>
+              ${f.extracted ? `<span>🧠 ${(f.extracted.qa_pairs || 0) + (f.extracted.objections || 0) + (f.extracted.techniques || 0)} عنصر مستخرج</span>` : ''}
+              <span>🕐 ${new Date(f.uploaded_at).toLocaleDateString('ar-SA')}</span>
+            </div>
+          </div>
+          <div class="file-item-actions">
+            <button class="delete-btn" onclick="deleteFile('${f.id}','${safeName}')">🗑️ حذف</button>
+          </div>
+        </li>`;
+            }).join('');
+        }
+
+        // ---- Load Stats ----
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/knowledge');
+                const data = await res.json();
+                document.getElementById('totalDocs').textContent = data.stats?.total_documents || 0;
+            } catch (e) { console.error(e); }
+        }
+
+        // ---- Delete File ----
+        async function deleteFile(id, name) {
+            if (!confirm(`هل تريد حذف الملف "${name}"؟\nسيتم حذف جميع الوثائق المستخرجة منه.`)) return;
+            try {
+                const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`🗑️ تم حذف ${name}`);
+                    loadFiles();
+                    loadStats();
+                } else {
+                    showToast(`❌ خطأ: ${data.error}`);
+                }
+            } catch (e) { showToast('❌ خطأ في الاتصال'); }
+        }
+
+        // ---- Toast ----
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ---- Gemini Settings ----
+        async function loadGeminiStatus() {
+            try {
+                const res = await fetch('/api/gemini-status');
+                const data = await res.json();
+                const badge = document.getElementById('geminiStatusBadge');
+                if (data.configured) {
+                    badge.textContent = '✅ مفعّل';
+                    badge.style.background = 'rgba(16,185,129,0.15)';
+                    badge.style.color = 'var(--accent-green)';
+                    document.getElementById('geminiApiKey').placeholder = '••••••• (المفتاح محفوظ — أدخل واحداً جديداً للتغيير)';
+                }
+            } catch (e) { }
+        }
+
+        async function saveGeminiKey() {
+            const key = document.getElementById('geminiApiKey').value.trim();
+            const msg = document.getElementById('geminiMsg');
+            if (!key) { msg.style.display = 'block'; msg.style.background = 'rgba(239,68,68,0.1)'; msg.style.color = 'var(--accent-red)'; msg.textContent = 'أدخل المفتاح أولاً'; return; }
+            try {
+                const res = await fetch('/api/gemini-key', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ api_key: key }) });
+                const data = await res.json();
+                if (data.success) {
+                    msg.style.display = 'block'; msg.style.background = 'rgba(16,185,129,0.1)'; msg.style.color = 'var(--accent-green)'; msg.textContent = '✅ تم حفظ المفتاح — Gemini مفعّل الآن!';
+                    document.getElementById('geminiApiKey').value = '';
+                    loadGeminiStatus();
+                    showToast('✅ Gemini AI مفعّل!');
+                } else {
+                    msg.style.display = 'block'; msg.style.background = 'rgba(239,68,68,0.1)'; msg.style.color = 'var(--accent-red)'; msg.textContent = data.error || 'خطأ';
+                }
+            } catch (e) { msg.style.display = 'block'; msg.style.background = 'rgba(239,68,68,0.1)'; msg.style.color = 'var(--accent-red)'; msg.textContent = 'خطأ في الاتصال'; }
+        }
+
+        // ---- Recordings ----
+        function setupRecordingUpload() {
+            const zone = document.getElementById('recordingZone');
+            ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('dragover'); }));
+            ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('dragover'); }));
+            zone.addEventListener('drop', e => { if (e.dataTransfer.files.length) uploadRecordings(e.dataTransfer.files); });
+            document.getElementById('recordingInput').addEventListener('change', e => { if (e.target.files.length) uploadRecordings(e.target.files); });
+        }
+
+        async function uploadRecordings(files) {
+            const progress = document.getElementById('recordingProgress');
+            progress.classList.add('active');
+            progress.innerHTML = '';
+            for (const file of files) {
+                const item = document.createElement('div');
+                item.className = 'progress-item';
+                item.innerHTML = `<div class="spinner"></div><span>يحلل ${file.name}... (قد يستغرق دقيقة)</span>`;
+                progress.appendChild(item);
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await fetch('/api/upload-recording', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        const score = data.analysis?.score || '?';
+                        item.className = 'progress-item done';
+                        item.innerHTML = `<span>✅ ${file.name} — تقييم: ${score}/10 — ${data.docs_added} وثيقة مستخرجة</span>`;
+                        showToast(`✅ تم تحليل ${file.name}`);
+                    } else {
+                        item.className = 'progress-item error';
+                        item.innerHTML = `<span>❌ ${file.name} — ${data.error || 'خطأ'}</span>`;
+                    }
+                } catch (err) {
+                    item.className = 'progress-item error';
+                    item.innerHTML = `<span>❌ ${file.name} — خطأ في الاتصال</span>`;
+                }
+            }
+            loadRecordings();
+            loadStats();
+            document.getElementById('recordingInput').value = '';
+        }
+
+        async function loadRecordings() {
+            try {
+                const res = await fetch('/api/recordings');
+                const data = await res.json();
+                const list = document.getElementById('recordingList');
+                const recordings = data.recordings || [];
+                document.getElementById('recordingCountBadge').textContent = recordings.length;
+                if (recordings.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.8rem">لا توجد تسجيلات بعد</div>';
+                    return;
+                }
+                list.innerHTML = recordings.map(r => `
+                <div class="file-item">
+                    <div class="file-item-icon">🎙️</div>
+                    <div class="file-item-info">
+                        <div class="file-item-name">${r.filename}</div>
+                        <div class="file-item-meta">
+                            <span>⭐ تقييم: ${r.score || '?'}/10</span>
+                            <span>📊 ${r.docs_added || 0} وثيقة</span>
+                            <span>🕐 ${new Date(r.uploaded_at).toLocaleDateString('ar-SA')}</span>
+                        </div>
+                        ${r.summary ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem">${r.summary}</div>` : ''}
+                    </div>
+                    <div class="file-item-actions">
+                        <button class="delete-btn" onclick="deleteRecording('${r.id}','${r.filename}')">🗑️ حذف</button>
+                    </div>
+                </div>`).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteRecording(id, name) {
+            if (!confirm(`هل تريد حذف التسجيل "${name}"؟`)) return;
+            try {
+                const res = await fetch(`/api/recordings/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) { showToast(`🗑️ تم حذف ${name}`); loadRecordings(); loadStats(); }
+                else showToast(`❌ ${data.error}`);
+            } catch (e) { showToast('❌ خطأ'); }
+        }
+    </script>
+</body>
+
+</html>

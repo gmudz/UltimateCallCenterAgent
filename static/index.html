@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Sales Copilot — المساعد الذكي للمبيعات في قطاع الوساطة المالية">
+  <title>AI Sales Copilot | المساعد الذكي للمبيعات</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">🤖</div>
+      <div>
+        <div class="header-title">AI Sales Copilot</div>
+        <div class="header-subtitle">المساعد الذكي للمبيعات — الوساطة المالية</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="/analytics" class="btn btn-ghost btn-sm" style="text-decoration:none">📊 التحليلات</a>
+      <a href="/training" class="btn btn-ghost btn-sm" style="text-decoration:none">🎓 التدريب</a>
+      <a href="/admin" class="btn btn-ghost btn-sm" style="text-decoration:none" id="adminLink">📁 الإدارة</a>
+      <a href="/users" class="btn btn-ghost btn-sm" style="text-decoration:none" id="usersLink" style="display:none">👥
+        المستخدمين</a>
+      <div class="call-timer" id="callTimer">
+        <span class="rec-dot"></span>
+        <span id="timerDisplay">00:00</span>
+      </div>
+      <span id="currentUserName" style="font-size:0.75rem;color:var(--text-muted)"></span>
+      <button onclick="logoutUser()" class="btn btn-ghost btn-sm"
+        style="color:var(--accent-red);border-color:rgba(239,68,68,0.3)">🚪 خروج</button>
+      <div class="header-status">
+        <span class="status-dot disconnected" id="statusDot"></span>
+        <span id="statusText">غير متصل</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard -->
+  <main class="dashboard">
+    <!-- Demo Controls Bar -->
+    <div class="card demo-controls" id="demoControls">
+      <div class="card-header" style="border:none;padding:0;background:none;flex:0;">
+        <h3><span class="icon">🎬</span> وضع التجريب</h3>
+      </div>
+      <select class="scenario-select" id="scenarioSelect">
+        <option value="">— اختر سيناريو المكالمة —</option>
+      </select>
+      <div class="speed-control">
+        <span>السرعة:</span>
+        <input type="range" min="0.5" max="2" step="0.25" value="1" id="speedControl">
+        <span id="speedLabel">1x</span>
+      </div>
+      <button class="btn btn-primary" id="startBtn" onclick="startDemo()">
+        ▶ بدء المحاكاة
+      </button>
+      <button class="btn btn-danger" id="stopBtn" onclick="stopDemo()" style="display:none">
+        ⏹ إيقاف
+      </button>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Col 1: Live Transcription -->
+    <div class="card transcript-panel">
+      <div class="card-header">
+        <h3><span class="icon">🎙️</span> النص المباشر</h3>
+        <span class="card-badge" id="segmentCount" style="background:var(--bg-glass);color:var(--text-muted)">0
+          رسالة</span>
+      </div>
+      <div class="card-body">
+        <div class="thinking-indicator" id="thinkingIndicator">
+          <div class="thinking-dots"><span></span><span></span><span></span></div>
+          <span>جارٍ تحليل المحادثة...</span>
+        </div>
+        <div class="transcript-feed" id="transcriptFeed">
+          <div class="empty-state">
+            <div class="empty-state-icon">🎙️</div>
+            <div class="empty-state-text">ابدأ محاكاة مكالمة لرؤية النص المباشر هنا<br>اختر سيناريو واضغط "بدء
+              المحاكاة"<br>أو اكتب نصاً يدوياً في الحقل أدناه</div>
+          </div>
+        </div>
+      </div>
+      <div class="manual-input-container">
+        <div class="speaker-toggle">
+          <button class="active" id="speakerClient" onclick="setSpeaker('client')">👤 عميل</button>
+          <button id="speakerAgent" onclick="setSpeaker('agent')">🎧 موظف</button>
+        </div>
+        <input type="text" class="manual-input" id="manualInput" placeholder="اكتب نصاً لتحليله..."
+          onkeypress="if(event.key==='Enter')sendManualText()">
+        <button class="btn btn-primary btn-sm" onclick="sendManualText()">إرسال ➤</button>
+      </div>
+      <!-- Microphone Bar -->
+      <div class="mic-bar" id="micBar">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+          <span class="mic-icon" id="micIcon">🎙️</span>
+          <span id="micLabel">تشغيل الميكروفون</span>
+        </button>
+        <div class="mic-status" id="micStatus" style="display:none">
+          <div class="mic-level-container">
+            <div class="mic-level" id="micLevel"></div>
+          </div>
+          <span id="micStatusText">يسمع...</span>
+        </div>
+        <div class="mic-interim" id="micInterim"></div>
+      </div>
+    </div>
+
+    <!-- Col 2 Top: Client Profile -->
+    <div class="card client-profile" id="clientProfileCard">
+      <div class="card-header">
+        <h3><span class="icon">👤</span> ملف العميل</h3>
+        <span class="card-badge" id="clientTypeBadge"
+          style="background:var(--bg-glass);color:var(--text-muted)">—</span>
+      </div>
+      <div class="card-body">
+        <div id="clientProfileContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">👤</div>
+            <div class="empty-state-text">سيتم تحليل شخصية العميل تلقائياً<br>أثناء المحادثة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Col 2 Bottom: Battle Cards + Coaching -->
+    <div class="card battle-cards-container" id="battleCardsCard">
+      <div class="card-header">
+        <h3><span class="icon">⚔️</span> بطاقات المعركة والاقتراحات</h3>
+        <span class="card-badge" id="battleCardCount"
+          style="background:var(--bg-glass);color:var(--text-muted)">0</span>
+      </div>
+      <div class="card-body">
+        <!-- Stage & Mood Indicator -->
+        <div class="stage-indicator" id="stageIndicator" style="display:none">
+          <span class="stage-icon" id="stageIcon">📋</span>
+          <div class="stage-info">
+            <h4 id="stageName">—</h4>
+            <p id="stageGoal">—</p>
+          </div>
+        </div>
+        <div id="moodBadge" style="display:none"></div>
+
+        <!-- Smart Suggestions -->
+        <div id="coachingContent"></div>
+
+        <!-- Battle Cards -->
+        <div id="battleCardsContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">🤖</div>
+            <div class="empty-state-text">المساعد الذكي يراقب المحادثة...<br>سيقترح عليك ماذا تقول وكيف ترد<br>بناءً على
+              أسلوب أفضل الموظفين</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Col 3: Sidebar -->
+    <div class="market-sidebar">
+      <!-- Compliance -->
+      <div class="card compliance-panel" style="margin-bottom:1rem">
+        <div class="card-header">
+          <h3><span class="icon">🛡️</span> مراقبة الامتثال</h3>
+        </div>
+        <div class="card-body">
+          <div class="compliance-score-display">
+            <div class="compliance-score-number" id="complianceScore">100</div>
+            <div class="compliance-score-label" id="complianceLabel">ممتاز</div>
+          </div>
+          <div id="violationsList"></div>
+        </div>
+      </div>
+
+      <!-- Market Data -->
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-header">
+          <h3><span class="icon">📊</span> بيانات السوق</h3>
+        </div>
+        <div class="card-body" id="marketDataContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-text">جارٍ تحميل البيانات...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAG Results -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span class="icon">🧠</span> قاعدة المعرفة</h3>
+        </div>
+        <div class="card-body rag-results">
+          <div class="knowledge-search">
+            <input type="text" id="knowledgeSearch" placeholder="ابحث في قاعدة المعرفة..."
+              onkeypress="if(event.key==='Enter')searchKnowledge()">
+            <button class="btn btn-ghost btn-sm" onclick="searchKnowledge()">🔍</button>
+          </div>
+          <div id="ragContent">
+            <div class="empty-state">
+              <div class="empty-state-icon">🧠</div>
+              <div class="empty-state-text">ابحث أو ستظهر النتائج تلقائياً</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Call Summary Modal -->
+  <div class="call-summary-overlay" id="callSummaryOverlay" onclick="if(event.target===this)closeSummary()">
+    <div class="call-summary-modal">
+      <div class="summary-header">
+        <h2>📋 ملخص المكالمة</h2>
+        <p id="summarySubtitle">تقرير تحليلي للمكالمة</p>
+      </div>
+      <div class="summary-body">
+        <div class="summary-stats" id="summaryStats"></div>
+        <div id="summaryDetails"></div>
+      </div>
+      <div class="summary-footer">
+        <button class="btn btn-primary" onclick="closeSummary()">إغلاق</button>
+        <button class="btn btn-ghost" onclick="resetDashboard();closeSummary()">مكالمة جديدة</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+
+</html>

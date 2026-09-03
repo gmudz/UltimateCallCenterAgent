@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وضع التدريب | AI Sales Copilot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .training-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .training-hero {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .training-hero h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .training-hero p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .scenario-card {
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-main);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .scenario-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .scenario-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .scenario-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .scenario-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .scenario-meta {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .scenario-tag {
+            padding: 0.25rem 0.6rem;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .difficulty {
+            display: flex;
+            gap: 2px;
+            margin-top: 0.8rem;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-glass);
+        }
+
+        .difficulty-dot.filled {
+            background: var(--accent-amber);
+        }
+
+        .tips-section {
+            grid-column: 1 / -1;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .tip-card {
+            padding: 1.2rem;
+            border-right: 3px solid var(--accent-cyan);
+        }
+
+        .tip-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tip-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 800px) {
+            .training-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-brand">
+            <div class="header-logo">🎓</div>
+            <div>
+                <div class="header-title">وضع التدريب</div>
+                <div class="header-subtitle">تدرّب على سيناريوهات المبيعات مع تقييم فوري</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="/" class="btn btn-ghost btn-sm" style="text-decoration:none">🏠 الرئيسية</a>
+            <a href="/analytics" class="btn btn-ghost btn-sm" style="text-decoration:none">📊 التحليلات</a>
+        </div>
+    </header>
+
+    <div class="training-container">
+        <!-- Hero -->
+        <div class="card training-hero">
+            <h1>🎓 مركز تدريب المبيعات</h1>
+            <p>اختر سيناريو للتدرب عليه. المساعد الذكي سيراقب أداءك ويقدم ملاحظات فورية حول تصنيف العميل، معالجة
+                الاعتراضات، والامتثال.</p>
+        </div>
+
+        <!-- Scenario Cards -->
+        <div class="card scenario-card" onclick="startTraining('emotional_client')">
+            <div class="card-body" style="text-align:center;padding:1.5rem">
+                <span class="scenario-icon">💭</span>
+                <div class="scenario-title">العميل العاطفي</div>
+                <div class="scenario-desc">عميل من السعودية متحمس لكن خائف. يحتاج تطمين وبناء ثقة. يتأثر بالقصص والتجارب
+                    الشخصية.</div>
+                <div class="scenario-meta">
+                    <span class="scenario-tag">🇸🇦 لهجة خليجية</span>
+                    <span class="scenario-tag">⏱️ ~55 ثانية</span>
+                    <span class="scenario-tag">📋 12 رسالة</span>
+                </div>
+                <div class="difficulty" title="سهولة: متوسطة">
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card scenario-card" onclick="startTraining('analyst_client')">
+            <div class="card-body" style="text-align:center;padding:1.5rem">
+                <span class="scenario-icon">📊</span>
+                <div class="scenario-title">العميل المحلل</div>
+                <div class="scenario-desc">عميل من الأردن يقارن الشركات ويسأل عن تفاصيل دقيقة. يحتاج أرقام ومقارنات
+                    تنافسية واضحة.</div>
+                <div class="scenario-meta">
+                    <span class="scenario-tag">🇯🇴 لهجة شامية</span>
+                    <span class="scenario-tag">⏱️ ~55 ثانية</span>
+                    <span class="scenario-tag">📋 12 رسالة</span>
+                </div>
+                <div class="difficulty" title="سهولة: صعبة">
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card scenario-card" onclick="startTraining('leader_client')">
+            <div class="card-body" style="text-align:center;padding:1.5rem">
+                <span class="scenario-icon">👑</span>
+                <div class="scenario-title">العميل القائد</div>
+                <div class="scenario-desc">عميل من مصر يدّعي الخبرة ويسيطر على المحادثة. يحتاج موافقة ذكية ثم إضافة قيمة
+                    جديدة.</div>
+                <div class="scenario-meta">
+                    <span class="scenario-tag">🇪🇬 لهجة مصرية</span>
+                    <span class="scenario-tag">⏱️ ~55 ثانية</span>
+                    <span class="scenario-tag">📋 12 رسالة</span>
+                </div>
+                <div class="difficulty" title="سهولة: صعبة جداً">
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card scenario-card" onclick="startTraining('nice_client')">
+            <div class="card-body" style="text-align:center;padding:1.5rem">
+                <span class="scenario-icon">😊</span>
+                <div class="scenario-title">العميلة اللطيفة</div>
+                <div class="scenario-desc">عميلة من الإمارات تسأل كثيراً لكن تتهرب من الالتزام. تحتاج محفزات زمنية
+                    والتزامات صغيرة.</div>
+                <div class="scenario-meta">
+                    <span class="scenario-tag">🇦🇪 لهجة خليجية</span>
+                    <span class="scenario-tag">⏱️ ~55 ثانية</span>
+                    <span class="scenario-tag">📋 12 رسالة</span>
+                </div>
+                <div class="difficulty" title="سهولة: متوسطة">
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot filled"></div>
+                    <div class="difficulty-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="icon">💡</span> نصائح التدريب</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tips-grid">
+                        <div class="card tip-card">
+                            <h4>🎯 نموذج 3M</h4>
+                            <p>دائماً اربط بين الخبر الاقتصادي (المحرك)، السوق المتأثر، والحركة المتوقعة. حوّل النقاش
+                                إلى أرقام ملموسة.</p>
+                        </div>
+                        <div class="card tip-card">
+                            <h4>🛡️ معالجة الاعتراضات</h4>
+                            <p>لا تتجاهل اعتراض العميل أبداً. استمع أولاً، وافق على مخاوفه، ثم قدّم الحل. راقب بطاقات
+                                المعركة.</p>
+                        </div>
+                        <div class="card tip-card">
+                            <h4>⚖️ الامتثال</h4>
+                            <p>لا تعد بأرباح مضمونة، لا تحلف بالله، لا تضغط بشكل مفرط. درجة الامتثال يجب أن تبقى فوق
+                                90%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startTraining(scenarioId) {
+            // Navigate to main page with scenario pre-selected
+            window.location.href = `/?scenario=${scenarioId}&mode=training`;
+        }
+    </script>
+</body>
+
+</html>

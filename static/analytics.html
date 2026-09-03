@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحليلات | AI Sales Copilot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stat-card .stat-sub {
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            margin-top: 0.3rem;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 0 1.5rem 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .chart-card {
+            padding: 1.2rem;
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .bar-label {
+            width: 80px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: left;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 28px;
+            background: var(--bg-glass);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            transition: width 1s ease;
+        }
+
+        .history-section {
+            padding: 0 1.5rem 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: right;
+            padding: 0.7rem;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .history-table td {
+            padding: 0.7rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.85rem;
+        }
+
+        .history-table tr:hover td {
+            background: var(--bg-glass);
+        }
+
+        .type-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1000px) {
+            .analytics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-brand">
+            <div class="header-logo">📊</div>
+            <div>
+                <div class="header-title">لوحة التحليلات</div>
+                <div class="header-subtitle">أداء الموظف وإحصائيات المكالمات</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="/" class="btn btn-ghost btn-sm" style="text-decoration:none">🏠 الرئيسية</a>
+            <a href="/training" class="btn btn-ghost btn-sm" style="text-decoration:none">🎓 التدريب</a>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="analytics-grid" id="statsGrid">
+        <div class="card stat-card">
+            <div class="stat-value" id="totalCalls">0</div>
+            <div class="stat-label">إجمالي المكالمات</div>
+            <div class="stat-sub">↑ ابدأ محاكاة لتسجيل مكالمات</div>
+        </div>
+        <div class="card stat-card">
+            <div class="stat-value" id="avgCompliance">100</div>
+            <div class="stat-label">متوسط درجة الامتثال</div>
+            <div class="stat-sub">من 100%</div>
+        </div>
+        <div class="card stat-card">
+            <div class="stat-value" id="avgDuration">0</div>
+            <div class="stat-label">متوسط مدة المكالمة</div>
+            <div class="stat-sub">بالثواني</div>
+        </div>
+        <div class="card stat-card">
+            <div class="stat-value" id="conversionRate">0%</div>
+            <div class="stat-label">معدل التحويل</div>
+            <div class="stat-sub">العملاء المحوّلين</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+        <div class="card chart-card">
+            <h3>👤 توزيع أنواع العملاء</h3>
+            <div class="bar-chart" id="clientTypeChart">
+                <div style="text-align:center;padding:2rem;color:var(--text-muted)">لا توجد بيانات بعد — قم بإجراء
+                    مكالمات أولاً</div>
+            </div>
+        </div>
+        <div class="card chart-card">
+            <h3>⚔️ الاعتراضات الأكثر شيوعاً</h3>
+            <div class="bar-chart" id="objectionChart">
+                <div style="text-align:center;padding:2rem;color:var(--text-muted)">لا توجد بيانات بعد</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call History -->
+    <div class="history-section">
+        <div class="card">
+            <div class="card-header">
+                <h3><span class="icon">📋</span> سجل المكالمات</h3>
+                <span class="card-badge" id="historyCount"
+                    style="background:var(--bg-glass);color:var(--text-muted)">0</span>
+            </div>
+            <div class="card-body">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>الوقت</th>
+                            <th>اسم العميل</th>
+                            <th>نوع العميل</th>
+                            <th>المدة</th>
+                            <th>الامتثال</th>
+                            <th>الاعتراضات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">لا توجد
+                                مكالمات مسجلة بعد — ابدأ محاكاة من الصفحة الرئيسية</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const typeLabels = { emotional: 'عاطفي 💭', analyst: 'محلل 📊', leader: 'قائد 👑', nice: 'لطيف 😊', unknown: 'غير محدد ❓' };
+        const typeColors = { emotional: 'var(--accent-pink)', analyst: 'var(--accent-cyan)', leader: 'var(--accent-amber)', nice: 'var(--accent-green)', unknown: 'var(--text-muted)' };
+        const objLabels = { sharia: 'الشرعية 🕌', fraud: 'النصب 🛡️', loss: 'الخسارة 📉', competitor: 'المنافسين ⚔️', timing: 'التأجيل ⏰' };
+
+        async function loadAnalytics() {
+            try {
+                const [analyticsRes, historyRes] = await Promise.all([
+                    fetch('/api/analytics'), fetch('/api/call-history')
+                ]);
+                const analytics = await analyticsRes.json();
+                const history = await historyRes.json();
+                renderStats(analytics);
+                renderCharts(analytics);
+                renderHistory(history.calls);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderStats(data) {
+            document.getElementById('totalCalls').textContent = data.total_calls;
+            document.getElementById('avgCompliance').textContent = data.avg_compliance;
+            document.getElementById('avgDuration').textContent = data.avg_duration + 's';
+            document.getElementById('conversionRate').textContent = data.conversion_rate + '%';
+        }
+
+        function renderCharts(data) {
+            // Client types
+            const ctContainer = document.getElementById('clientTypeChart');
+            const total = Object.values(data.client_types).reduce((a, b) => a + b, 0);
+            if (total > 0) {
+                ctContainer.innerHTML = '';
+                for (const [type, count] of Object.entries(data.client_types)) {
+                    const pct = Math.round(count / total * 100);
+                    ctContainer.innerHTML += `<div class="bar-row"><div class="bar-label">${typeLabels[type] || type}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${typeColors[type] || typeColors.unknown}">${count} (${pct}%)</div></div></div>`;
+                }
+            }
+            // Objections
+            const objContainer = document.getElementById('objectionChart');
+            const objTotal = Object.values(data.objection_types).reduce((a, b) => a + b, 0);
+            if (objTotal > 0) {
+                objContainer.innerHTML = '';
+                for (const [type, count] of Object.entries(data.objection_types)) {
+                    const pct = Math.round(count / objTotal * 100);
+                    objContainer.innerHTML += `<div class="bar-row"><div class="bar-label">${objLabels[type] || type}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--accent-blue)">${count}</div></div></div>`;
+                }
+            }
+        }
+
+        function renderHistory(calls) {
+            document.getElementById('historyCount').textContent = calls.length;
+            const body = document.getElementById('historyBody');
+            if (calls.length === 0) return;
+            body.innerHTML = '';
+            calls.reverse().forEach(c => {
+                const time = c.timestamp ? new Date(c.timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '—';
+                const type = typeLabels[c.client_type] || c.client_type;
+                const color = typeColors[c.client_type] || typeColors.unknown;
+                const compColor = c.compliance_score >= 90 ? 'var(--accent-green)' : c.compliance_score >= 70 ? 'var(--accent-amber)' : 'var(--accent-red)';
+                body.innerHTML += `<tr>
+          <td>${time}</td>
+          <td>${c.client_name || '—'}</td>
+          <td><span class="type-badge" style="background:${color}22;color:${color}">${type}</span></td>
+          <td>${c.duration_seconds}s</td>
+          <td style="color:${compColor};font-weight:700">${c.compliance_score}%</td>
+          <td>${c.objections.length > 0 ? c.objections.map(o => objLabels[o] || o).join('، ') : '—'}</td>
+        </tr>`;
+            });
+        }
+
+        loadAnalytics();
+        setInterval(loadAnalytics, 10000);
+    </script>
+</body>
+
+</html>

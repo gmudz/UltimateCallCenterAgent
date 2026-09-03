@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين | AI Sales Copilot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-header h1 {
+            font-size: 1.4rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a {
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-glass);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-glass);
+            transition: all 0.2s;
+        }
+
+        .admin-nav a:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* User Table */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            text-align: right;
+            padding: 0.6rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-glass);
+            font-weight: 600;
+        }
+
+        .user-table td {
+            padding: 0.6rem;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .user-table tr:hover td {
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        .role-badge {
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .role-badge.admin {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+        }
+
+        .role-badge.agent {
+            background: rgba(6, 182, 212, 0.15);
+            color: #22d3ee;
+        }
+
+        .status-badge {
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .status-badge.inactive {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .action-btn {
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-glass);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+            margin-left: 0.2rem;
+        }
+
+        .action-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        .action-btn.delete:hover {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* Add User Form */
+        .form-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.55rem 0.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.55rem 0.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            appearance: none;
+        }
+
+        .form-select option {
+            background: #1e293b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--gradient-main);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .mini-stat {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .mini-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .mini-stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.1rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .success-msg {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.78rem;
+            color: var(--accent-green);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        .error-msg {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.78rem;
+            color: var(--accent-red);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <header
+        style="display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.5rem;border-bottom:1px solid var(--border-glass)">
+        <div class="admin-nav">
+            <a href="/">🎙️ لوحة التحكم</a>
+            <a href="/admin">📁 التدريب</a>
+            <a href="/analytics">📊 التحليلات</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.7rem">
+            <span id="currentUser" style="font-size:0.8rem;color:var(--text-muted)"></span>
+            <button onclick="logout()"
+                style="padding:0.3rem 0.8rem;border-radius:8px;border:1px solid var(--border-glass);background:transparent;color:var(--accent-red);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:0.75rem">🚪
+                خروج</button>
+            <div
+                style="width:36px;height:36px;border-radius:50%;background:var(--gradient-main);display:flex;align-items:center;justify-content:center;font-size:1.1rem">
+                🤖</div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>👥 إدارة المستخدمين</h1>
+                <p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.3rem">إضافة وإدارة حسابات المدراء
+                    والموظفين</p>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="mini-stat">
+                <div class="mini-stat-value" id="totalUsers">0</div>
+                <div class="mini-stat-label">إجمالي المستخدمين</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-value" id="totalAdmins">0</div>
+                <div class="mini-stat-label">مدراء</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-value" id="totalAgents">0</div>
+                <div class="mini-stat-label">موظفين</div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Add User -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="icon">➕</span> إضافة مستخدم جديد</h3>
+                </div>
+                <div class="card-body">
+                    <form onsubmit="addUser(event)">
+                        <div class="form-group">
+                            <label class="form-label">الاسم الظاهر</label>
+                            <input type="text" class="form-input" id="displayName" placeholder="مثال: أحمد محمد"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">اسم المستخدم</label>
+                            <input type="text" class="form-input" id="newUsername" placeholder="مثال: ahmed" required
+                                minlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-input" id="newPassword" placeholder="4 أحرف على الأقل"
+                                required minlength="4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الدور</label>
+                            <select class="form-select" id="newRole">
+                                <option value="agent">🎧 موظف (Agent)</option>
+                                <option value="admin">👑 مدير (Admin)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn">➕ إضافة المستخدم</button>
+                    </form>
+                    <div class="success-msg" id="addSuccess"></div>
+                    <div class="error-msg" id="addError"></div>
+                </div>
+            </div>
+
+            <!-- Users List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="icon">📋</span> المستخدمون</h3>
+                    <span class="card-badge" id="userCount"
+                        style="background:var(--bg-glass);color:var(--text-muted)">0</span>
+                </div>
+                <div class="card-body" style="padding:0">
+                    <table class="user-table" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>الدور</th>
+                                <th>الحالة</th>
+                                <th>آخر دخول</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            loadCurrentUser();
+        });
+
+        async function loadCurrentUser() {
+            try {
+                const res = await fetch('/api/me');
+                const data = await res.json();
+                if (data.user) {
+                    document.getElementById('currentUser').textContent = `${data.user.display_name} (${data.user.role === 'admin' ? 'مدير' : 'موظف'})`;
+                }
+            } catch (e) { }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users');
+                if (res.status === 403 || res.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                const data = await res.json();
+                renderUsers(data.users || []);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('userTableBody');
+            document.getElementById('userCount').textContent = users.length;
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('totalAdmins').textContent = users.filter(u => u.role === 'admin').length;
+            document.getElementById('totalAgents').textContent = users.filter(u => u.role === 'agent').length;
+
+            tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>
+            <div style="font-weight:600">${u.display_name}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted)">@${u.username}</div>
+          </td>
+          <td><span class="role-badge ${u.role}">${u.role === 'admin' ? '👑 مدير' : '🎧 موظف'}</span></td>
+          <td><span class="status-badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? '✅ نشط' : '⛔ معطّل'}</span></td>
+          <td style="font-size:0.72rem;color:var(--text-muted)">${u.last_login ? new Date(u.last_login).toLocaleDateString('ar-SA') : '—'}</td>
+          <td>
+            <button class="action-btn" onclick="toggleUser(${u.id})" title="${u.is_active ? 'تعطيل' : 'تفعيل'}">${u.is_active ? '⛔' : '✅'}</button>
+            <button class="action-btn delete" onclick="deleteUser(${u.id},'${u.display_name}')" title="حذف">🗑️</button>
+          </td>
+        </tr>`).join('');
+        }
+
+        async function addUser(e) {
+            e.preventDefault();
+            const success = document.getElementById('addSuccess');
+            const error = document.getElementById('addError');
+            success.classList.remove('show');
+            error.classList.remove('show');
+
+            const body = {
+                username: document.getElementById('newUsername').value.trim(),
+                password: document.getElementById('newPassword').value,
+                display_name: document.getElementById('displayName').value.trim(),
+                role: document.getElementById('newRole').value
+            };
+
+            try {
+                const res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    success.textContent = `✅ تم إنشاء حساب ${body.username}`;
+                    success.classList.add('show');
+                    e.target.reset();
+                    loadUsers();
+                    showToast('✅ تم إضافة المستخدم');
+                } else {
+                    error.textContent = data.error || 'خطأ في الإنشاء';
+                    error.classList.add('show');
+                }
+            } catch (err) {
+                error.textContent = 'خطأ في الاتصال';
+                error.classList.add('show');
+            }
+        }
+
+        async function deleteUser(id, name) {
+            if (!confirm(`هل تريد حذف "${name}"؟`)) return;
+            try {
+                const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) { loadUsers(); showToast('🗑️ تم الحذف'); }
+                else showToast('❌ ' + (data.error || 'خطأ'));
+            } catch (e) { showToast('❌ خطأ في الاتصال'); }
+        }
+
+        async function toggleUser(id) {
+            try {
+                const res = await fetch(`/api/users/${id}/toggle`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) { loadUsers(); showToast('✅ تم التحديث'); }
+                else showToast('❌ ' + (data.error || 'خطأ'));
+            } catch (e) { showToast('❌ خطأ'); }
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>
